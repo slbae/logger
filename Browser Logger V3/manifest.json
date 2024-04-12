@@ -1,0 +1,37 @@
+{
+    "name": "Original",
+    "description": "browser extension",
+    "version": "0.1",
+    "manifest_version": 3,
+    "icons": {
+        "128": "paper.png"
+    },
+
+    "permissions": [
+        "tabs",
+        "webNavigation",
+        "activeTab",
+        "storage",
+        "downloads",
+        "identity",
+        "identity.email",
+        "unlimitedStorage",
+        "webRequest",
+        "idle"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "options_page": "./options.html",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [{
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ],
+        "js": ["content.js"]
+    }]
+
+}
