@@ -7,3 +7,5 @@ This version of the logger will start logging when the extension is installed. S
 4. Select Browser Logger V3 folder to open it
 5. Click the Extensions icon on top right of chrome browser 
 6. Pin the logger extension
+
+<a href="https://www.urldecoder.org/">Online URI Decoder</a>
