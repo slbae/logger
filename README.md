@@ -1,3 +1,5 @@
+This version of the logger will start logging when the extension is installed. Start/stop button do not exist.
+
 # To Install: 
 1. Go to chrome://extensions/
 2. Switch to Developer mode in top right corner
