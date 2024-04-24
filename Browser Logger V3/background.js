@@ -21,8 +21,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return true;
         });
     });
-
-    // console.log(textArr);
     return true;
 });
 
@@ -33,9 +31,9 @@ chrome.runtime.onInstalled.addListener(async() => {
         if (error) {
             console.error(error);
         }
-        // do something more
     });
-    await chrome.storage.local.set({ enabled: false })
+
+    await chrome.storage.local.set({ enabled: true })
     await chrome.storage.local.set({ "sessionCounter": 1 })
     await chrome.storage.local.set({ "path_urls": [] })
     await chrome.storage.local.set({ "searchQueries": [] })
@@ -45,9 +43,32 @@ chrome.runtime.onInstalled.addListener(async() => {
     await chrome.storage.local.set({ "clickEvents": [] })
     await chrome.storage.local.set({ "scrollEvents": [] })
     await chrome.storage.local.set({ "googleLinks": [] })
-    await chrome.action.setBadgeText({
-        text: 'OFF'
-    });
+
+    // Enable logging
+    enable();
+
+    // Call initialization functions
+    crLog();
+    savePath();
+    setData();
+
+    // Automatically set badge text to "ON" when the extension is installed
+    await chrome.action.setBadgeText({ text: "ON" });
+
+    // // Automatically enable logging when the extension is installed
+    // await chrome.storage.local.set({ enabled: true })
+    // await chrome.storage.local.set({ "sessionCounter": 1 })
+    // await chrome.storage.local.set({ "path_urls": [] })
+    // await chrome.storage.local.set({ "searchQueries": [] })
+    // await chrome.storage.local.set({ "copiedText": [] })
+    // await chrome.storage.local.set({ "pastedText": [] })
+    // await chrome.storage.local.set({ "keydownEvents": [] })
+    // await chrome.storage.local.set({ "clickEvents": [] })
+    // await chrome.storage.local.set({ "scrollEvents": [] })
+    // await chrome.storage.local.set({ "googleLinks": [] })
+    // await chrome.action.setBadgeText({
+    //     text: 'OFF'
+    // });
 })
 
 //when browser is opened
@@ -95,7 +116,6 @@ function crLog() {
             });
         });
 
-
         chrome.storage.local.get(function(items) {
             chrome.storage.local.get(["sessionCounter"]).then((result) => {
                 sessionCounter = result.sessionCounter;
@@ -112,28 +132,6 @@ function crLog() {
             });
         });
     });
-
-
-    //Gets Information of Tab after being closed
-    chrome.tabs.onRemoved.addListener(function(tabid, removed) {
-        chrome.tabs.query({ windowType: 'normal' }, function(tabs) {
-            if (tabs.length == 0) {
-                // storeCache();
-            }
-
-            // if (tabs.length < 2) {
-            //     chrome.tabs.create({ 'url': "chrome://newtab", active: false }, function(tab) {
-            //         // storeCache();
-            //         return true;
-            //     });
-            // }
-        });
-
-
-        if (!removed.isWindowClosing) {
-            // storeCache();
-        }
-    })
 
     //List all the tabs visited after start of a session
     chrome.tabs.onActivated.addListener(async () => {
@@ -167,31 +165,6 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
         }
     });
 });
-
-
-
-    //Emergency storage in case browser is closed altogether
-    function storeCache() {
-        chrome.storage.local.get(function(items) {
-
-            chrome.storage.local.get(["path_urls"]).then((result) => {
-                path_urls = result.path_urls;
-                if (Object.keys(items).length > 0 && items.cacheData) {
-                    items.cacheData.push({ tab_url: path_urls, cached_time: Date() });
-                } else {
-                    items.cacheData = [{ tab_url: path_urls, cached_time: Date() }];
-                }
-
-                chrome.storage.local.set(items, function() {
-                    return true;
-                });
-            });
-        });
-    }
-
-
-    //Checks the state of browser every 15 secs
-    //chrome.idle.setDetectionInterval(15);
 
     chrome.idle.onStateChanged.addListener(function(state) {
         chrome.storage.local.get(function(items) {
@@ -253,17 +226,6 @@ chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
             crLog();
             sendResponse("enable");
         });
-    } else if (message.message = "disable") {
-        await chrome.action.setBadgeText({ text: "OFF" });
-        chrome.storage.local.get("enabled", async function(result) {
-            result.enabled = false;
-            await chrome.storage.local.set({ "enabled": result.enabled });
-            savePath();
-            sendResponse("disable");
-        });
-    } else {
-        await chrome.action.setBadgeText({ text: "OFF" });
-        sendResponse("error");
     }
 })
 
@@ -293,14 +255,6 @@ function enable() {
     chrome.storage.local.set({ "googleLinks": [] }, function() {
         console.log("Set Google Links");
     });
-    // setData();
-    // crLog();
-}
-
-//Turn OFF the session
-function disable() {
-    chrome.storage.local.set({ "enabled": 2 });
-    savePath();
 }
 
 async function getCurrentTab(sessionCounter) {
@@ -309,4 +263,3 @@ async function getCurrentTab(sessionCounter) {
     let path = { Tab_ID: tabs[0].id, URL: tabs[0].url, Time: Date() }
     return path;
 }
-

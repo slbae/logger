@@ -11,11 +11,7 @@ function extractDomain(url) {
     return domain;
 }
 
-// Fix this to only track content when extension is enabled.
 // Currently tracking clicks, key presses, copy/pasted text, input searches, and scrolling behavior.
-chrome.storage.local.get("enabled", function (result) {
-    let enabled = result.enabled;
-    if (enabled) {
         // Google web scraping 
         window.addEventListener('load', google);
 
@@ -28,8 +24,6 @@ chrome.storage.local.get("enabled", function (result) {
         //window.addEventListener('load', printLists); // for testing
         window.addEventListener('scroll', trackScroll);
         window.addEventListener('beforeunload', saveScrollInfo); // Listen for tab close event to save the max scroll depth and avg speed
-    }
-});
 
 // Web scrape google page
 function google() {
